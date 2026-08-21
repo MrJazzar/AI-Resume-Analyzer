@@ -34,6 +34,7 @@ class Settings:
 
     # External services (used by later members, kept here for convenience)
     AI_API_KEY: str = os.getenv("AI_API_KEY", "")
+    AI_MODEL: str = os.getenv("AI_MODEL", "gemini-3.6-flash")
 
     # CORS
     ALLOWED_ORIGINS: list[str] = os.getenv(

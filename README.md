@@ -15,9 +15,9 @@ structure ready for the rest of the team to build on.
 
 ## Project structure
 
-This is Member 1's delivered slice. Folders marked *(empty scaffold)* are
-pre-created per the team's final architecture so later members don't have
-to decide layout mid-project.
+This repository contains the Member 1 foundation and the Member 2 resume
+upload, extraction, and AI analysis implementation. Remaining folders are
+scaffolds for later team members.
 
 ```
 AI-Resume-Analyzer/
@@ -28,8 +28,8 @@ AI-Resume-Analyzer/
 │   ├── models/            # SQLAlchemy models (user, resume, job, resume_analysis, session)
 │   ├── schemas/           # Pydantic request/response schemas
 │   ├── routes/            # auth, resumes, jobs, recommendations, career
-│   ├── services/          # auth_service.py (resume_service.py etc. → Member 2/3)
-│   ├── agents/            # (empty scaffold) → Member 2/3/4: resume_analyzer.py, job_matcher.py, career_advisor.py
+│   ├── services/          # authentication, extraction, and analysis services
+│   ├── agents/            # resume_analyzer.py; later job/career agents
 │   ├── rag/               # (empty scaffold) → Member 4: loader.py, retriever.py, pipeline.py
 │   └── utils/             # security.py, exceptions.py, deps.py, validators.py
 ├── knowledge_base/        # (empty scaffold) → Member 4: skills/, roadmaps/, jobs/, learning_resources/, resume_guidelines/
@@ -41,7 +41,6 @@ AI-Resume-Analyzer/
 ├── .env.example
 ├── .gitignore
 └── README.md
-```
 ```
 
 ## Setup
@@ -56,6 +55,7 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 cp .env.example .env            # then edit SECRET_KEY etc.
+# Set AI_API_KEY in .env to enable AI resume analysis (default: gemini-3.6-flash).
 
 uvicorn app.main:app --reload
 ```
@@ -74,7 +74,11 @@ no manual migration step is needed for this phase of the project.
 | POST   | `/api/auth/login`     | No  | Log in, starts a session |
 | POST   | `/api/auth/logout`    | No  | End the current session |
 | GET    | `/api/auth/me`        | Yes | Return the current user |
-| GET    | `/api/resumes/`       | Yes | Stub — Member 2 |
+| POST   | `/api/resumes/upload` | Yes | Upload and extract a PDF or DOCX resume |
+| GET    | `/api/resumes/`       | Yes | List the current user's resumes |
+| GET    | `/api/resumes/{resume_id}` | Yes | Return a resume and its extracted text |
+| POST   | `/api/resumes/{resume_id}/analyze` | Yes | Analyze the extracted resume text |
+| GET    | `/api/resumes/{resume_id}/analysis` | Yes | Return the saved resume analysis |
 | GET    | `/api/jobs/`          | No  | Stub — Member 3 |
 | GET    | `/api/recommendations/{resume_id}` | Yes | Stub — Member 3 |
 | GET    | `/api/career/`        | Yes | Stub — Member 4 |
@@ -125,27 +129,22 @@ and the global handlers in `app/main.py`).
 pytest tests/ -v
 ```
 
-8 tests cover registration, duplicate email rejection, login (success and
-failure), `/me` with and without a session, and logout invalidating the
-session.
+The test suite covers authentication plus resume validation, DOCX upload,
+text extraction, analysis, and analysis retrieval. Resume analysis calls the
+configured Gemini model and returns structured JSON; without `AI_API_KEY`, the
+analysis endpoint returns `503` rather than producing a local fallback result.
 
 ## For the next team member
 
 - Use `Depends(get_current_user)` from `app.utils.deps` to protect any new
   endpoint — see `app/routes/auth.py::me` for an example.
 - Use `Depends(get_db)` from `app.database` to get a DB session.
-- Stub routers already exist at `/api/resumes`, `/api/jobs`,
-  `/api/recommendations`, `/api/career` — extend them rather than creating
-  new routers, so prefixes stay consistent.
+- Resume files are stored under `uploads/` with generated names; user files
+  are ignored by Git. PDF and DOCX uploads are limited to 10 MB.
 - Raise `BadRequestError` / `NotFoundError` / etc. from `app.utils.exceptions`
   for consistent `{"detail": "..."}` error responses.
-- `app/agents/`, `app/rag/`, and `knowledge_base/` are empty scaffolds
-  matching the team's final architecture — Member 2 adds
-  `agents/resume_analyzer.py`, Member 3 adds `agents/job_matcher.py`,
-  Member 4 adds `agents/career_advisor.py` plus the `rag/` pipeline and
-  `knowledge_base/` content.
-- `app/utils/validators.py` has basic file-extension/size checks Member 2
-  can use (and extend) for resume upload validation.
+- `app/rag/` and `knowledge_base/` remain scaffolds for Member 4; Member 3
+  can add job matching without changing the resume API prefixes.
 
 ## Git workflow
 
