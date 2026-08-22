@@ -3,15 +3,42 @@ Job listing endpoints. Scaffolded by Member 1; implemented by later
 members.
 """
 
-from fastapi import APIRouter, Depends
+import json
 
-from app.database import get_db
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from app.database import get_db
+from app.models.job import Job
+from app.models.user import User
+from app.schemas.job import JobCreate, JobOut
+from app.utils.deps import get_current_user
+
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
+
+
+@router.post("/", response_model=JobOut, status_code=status.HTTP_201_CREATED)
+def create_job(
+    payload: JobCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    job = Job(
+        title=payload.title,
+        company=payload.company,
+        description=payload.description,
+        required_skills=json.dumps(payload.required_skills) if payload.required_skills is not None else None,
+        experience=payload.experience,
+        location=payload.location,
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    return job
 
 
 @router.get("/")
 def list_jobs(db: Session = Depends(get_db)):
     """TODO: return job postings."""
     return {"detail": "Not implemented yet"}
+
