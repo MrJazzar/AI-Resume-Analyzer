@@ -124,3 +124,57 @@ def test_get_job_by_id_not_found(client):
     assert response.status_code == 404
     assert response.json()["detail"] == "Job not found"
 
+
+def test_update_job_success(client):
+    register_and_login(client)
+    create_resp = client.post("/api/jobs/", json={"title": "Data Scientist", "company": "Meta"})
+    job_id = create_resp.json()["id"]
+
+    update_data = {
+        "title": "Lead Data Scientist",
+        "required_skills": ["Python", "PyTorch", "Statistics"]
+    }
+    update_resp = client.put(f"/api/jobs/{job_id}", json=update_data)
+    assert update_resp.status_code == 200
+    res_data = update_resp.json()
+    assert res_data["title"] == "Lead Data Scientist"
+    assert res_data["company"] == "Meta"
+
+    db = TestingSessionLocal()
+    try:
+        db_job = db.query(Job).filter(Job.id == job_id).first()
+        assert db_job.title == "Lead Data Scientist"
+        assert json.loads(db_job.required_skills) == ["Python", "PyTorch", "Statistics"]
+    finally:
+        db.close()
+
+
+def test_update_job_not_found(client):
+    register_and_login(client)
+    response = client.put("/api/jobs/99999", json={"title": "New Title"})
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Job not found"
+
+
+def test_update_job_invalid_data(client):
+    register_and_login(client)
+    create_resp = client.post("/api/jobs/", json={"title": "Data Scientist", "company": "Meta"})
+    job_id = create_resp.json()["id"]
+
+    response = client.put(f"/api/jobs/{job_id}", json={"title": ""})
+    assert response.status_code == 400
+
+
+def test_update_job_unauthenticated(client):
+    db = TestingSessionLocal()
+    job = Job(title="Unprotected Job")
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    job_id = job.id
+    db.close()
+
+    response = client.put(f"/api/jobs/{job_id}", json={"title": "New Title"})
+    assert response.status_code == 401
+
+

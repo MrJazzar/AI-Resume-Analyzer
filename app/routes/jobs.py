@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.job import Job
 from app.models.user import User
-from app.schemas.job import JobCreate, JobOut
+from app.schemas.job import JobCreate, JobOut, JobUpdate
 from app.utils.deps import get_current_user
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
@@ -48,5 +48,29 @@ def get_job(job_id: int, db: Session = Depends(get_db)):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+
+@router.put("/{job_id}", response_model=JobOut)
+def update_job(
+    job_id: int,
+    payload: JobUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        if key == "required_skills":
+            setattr(job, key, json.dumps(value) if value is not None else None)
+        else:
+            setattr(job, key, value)
+
+    db.commit()
+    db.refresh(job)
+    return job
+
 
 
