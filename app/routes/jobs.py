@@ -43,8 +43,36 @@ def list_jobs(db: Session = Depends(get_db)):
     return db.query(Job).all()
 
 
+@router.get("/search", response_model=list[JobOut])
+def search_jobs(skill: str | None = None, db: Session = Depends(get_db)):
+    if not skill or not skill.strip():
+        raise HTTPException(status_code=400, detail="Skill query parameter is required")
+
+    all_jobs = db.query(Job).all()
+    results = []
+    for job in all_jobs:
+        if not job.required_skills:
+            continue
+        try:
+            skills = json.loads(job.required_skills)
+            if isinstance(skills, list):
+                if any(skill.lower() == s.lower() for s in skills):
+                    results.append(job)
+                continue
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+        # Fallback to comma-separated check
+        skills = [s.strip().lower() for s in job.required_skills.split(",")]
+        if skill.lower() in skills:
+            results.append(job)
+
+    return results
+
+
 @router.get("/{job_id}", response_model=JobOut)
 def get_job(job_id: int, db: Session = Depends(get_db)):
+
     job = db.query(Job).filter(Job.id == job_id).first()
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")

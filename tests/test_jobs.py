@@ -215,4 +215,45 @@ def test_delete_job_unauthenticated(client):
     assert response.status_code == 401
 
 
+def test_search_jobs_success(client):
+    register_and_login(client)
+    client.post("/api/jobs/", json={"title": "Python Dev", "required_skills": ["Python", "FastAPI"]})
+    client.post("/api/jobs/", json={"title": "Java Dev", "required_skills": ["Java", "Spring"]})
+    client.post("/api/jobs/", json={"title": "AI Engineer", "required_skills": ["Python", "ML"]})
+
+    client.cookies.clear()  # Simulate unauthenticated client
+
+    resp = client.get("/api/jobs/search?skill=Python")
+    assert resp.status_code == 200
+    results = resp.json()
+    assert len(results) == 2
+    titles = [job["title"] for job in results]
+    assert "Python Dev" in titles
+    assert "AI Engineer" in titles
+    assert "Java Dev" not in titles
+
+
+def test_search_jobs_no_matches(client):
+    register_and_login(client)
+    client.post("/api/jobs/", json={"title": "Python Dev", "required_skills": ["Python", "FastAPI"]})
+    client.cookies.clear()
+
+    resp = client.get("/api/jobs/search?skill=Rust")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+def test_search_jobs_missing_param(client):
+    resp = client.get("/api/jobs/search")
+    assert resp.status_code == 400
+    assert "required" in resp.json()["detail"]
+
+
+def test_search_jobs_empty_param(client):
+    resp = client.get("/api/jobs/search?skill=   ")
+    assert resp.status_code == 400
+    assert "required" in resp.json()["detail"]
+
+
+
 
