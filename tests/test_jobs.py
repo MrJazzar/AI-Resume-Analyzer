@@ -81,3 +81,46 @@ def test_create_job_invalid_type(client):
     response = client.post("/api/jobs/", json=data)
     assert response.status_code == 400
     assert "detail" in response.json()
+
+
+def test_list_jobs_empty(client):
+    response = client.get("/api/jobs/")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_list_jobs_with_data(client):
+    register_and_login(client)
+    data = {"title": "Fullstack Developer", "company": "GitHub"}
+    client.post("/api/jobs/", json=data)
+
+    client.cookies.clear()  # Simulate unauthenticated client
+
+    response = client.get("/api/jobs/")
+    assert response.status_code == 200
+    res_list = response.json()
+    assert len(res_list) >= 1
+    assert res_list[0]["title"] == "Fullstack Developer"
+    assert res_list[0]["company"] == "GitHub"
+
+
+def test_get_job_by_id_exists(client):
+    register_and_login(client)
+    data = {"title": "DevOps Engineer", "company": "HashiCorp"}
+    post_resp = client.post("/api/jobs/", json=data)
+    job_id = post_resp.json()["id"]
+
+    client.cookies.clear()  # Simulate unauthenticated client
+
+    response = client.get(f"/api/jobs/{job_id}")
+    assert response.status_code == 200
+    res_data = response.json()
+    assert res_data["title"] == "DevOps Engineer"
+    assert res_data["company"] == "HashiCorp"
+
+
+def test_get_job_by_id_not_found(client):
+    response = client.get("/api/jobs/99999")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Job not found"
+

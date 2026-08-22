@@ -5,7 +5,7 @@ members.
 
 import json
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -37,8 +37,16 @@ def create_job(
     return job
 
 
-@router.get("/")
+@router.get("/", response_model=list[JobOut])
 def list_jobs(db: Session = Depends(get_db)):
-    """TODO: return job postings."""
-    return {"detail": "Not implemented yet"}
+    return db.query(Job).all()
+
+
+@router.get("/{job_id}", response_model=JobOut)
+def get_job(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
+
 
