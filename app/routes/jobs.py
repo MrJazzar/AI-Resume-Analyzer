@@ -12,6 +12,7 @@ from app.database import get_db
 from app.models.job import Job
 from app.models.user import User
 from app.schemas.job import JobCreate, JobOut, JobUpdate
+from app.schemas.user import MessageResponse
 from app.utils.deps import get_current_user
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
@@ -71,6 +72,22 @@ def update_job(
     db.commit()
     db.refresh(job)
     return job
+
+
+@router.delete("/{job_id}", response_model=MessageResponse)
+def delete_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    db.delete(job)
+    db.commit()
+    return {"detail": "Job deleted successfully"}
+
 
 
 

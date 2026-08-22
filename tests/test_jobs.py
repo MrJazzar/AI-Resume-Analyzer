@@ -178,3 +178,41 @@ def test_update_job_unauthenticated(client):
     assert response.status_code == 401
 
 
+def test_delete_job_success(client):
+    register_and_login(client)
+    create_resp = client.post("/api/jobs/", json={"title": "Cloud Engineer", "company": "AWS"})
+    job_id = create_resp.json()["id"]
+
+    response = client.delete(f"/api/jobs/{job_id}")
+    assert response.status_code == 200
+    assert response.json()["detail"] == "Job deleted successfully"
+
+    db = TestingSessionLocal()
+    try:
+        db_job = db.query(Job).filter(Job.id == job_id).first()
+        assert db_job is None
+    finally:
+        db.close()
+
+
+def test_delete_job_not_found(client):
+    register_and_login(client)
+    response = client.delete("/api/jobs/99999")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Job not found"
+
+
+def test_delete_job_unauthenticated(client):
+    db = TestingSessionLocal()
+    job = Job(title="Unprotected Job")
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    job_id = job.id
+    db.close()
+
+    response = client.delete(f"/api/jobs/{job_id}")
+    assert response.status_code == 401
+
+
+
