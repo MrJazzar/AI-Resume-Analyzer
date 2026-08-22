@@ -79,8 +79,14 @@ no manual migration step is needed for this phase of the project.
 | GET    | `/api/resumes/{resume_id}` | Yes | Return a resume and its extracted text |
 | POST   | `/api/resumes/{resume_id}/analyze` | Yes | Analyze the extracted resume text |
 | GET    | `/api/resumes/{resume_id}/analysis` | Yes | Return the saved resume analysis |
-| GET    | `/api/jobs/`          | No  | Stub — Member 3 |
-| GET    | `/api/recommendations/{resume_id}` | Yes | Stub — Member 3 |
+| GET    | `/api/jobs/`          | No  | List all job postings |
+| POST   | `/api/jobs/`          | Yes | Create a new job posting |
+| GET    | `/api/jobs/{id}`      | No  | Retrieve a specific job posting |
+| PUT    | `/api/jobs/{id}`      | Yes | Update a specific job posting |
+| DELETE | `/api/jobs/{id}`      | Yes | Delete a specific job posting |
+| GET    | `/api/jobs/search`    | No  | Search jobs by skill query parameter |
+| GET    | `/api/recommendations/{resume_id}` | Yes | List job recommendations ranked by score |
+| GET    | `/api/recommendations/{resume_id}/{job_id}` | Yes | Get detailed recommendation match with LLM explanation |
 | GET    | `/api/career/`        | Yes | Stub — Member 4 |
 
 Auth uses an `HttpOnly` session cookie (`session_id` by default), not a
