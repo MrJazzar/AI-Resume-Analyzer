@@ -28,3 +28,7 @@ uploads/*
 
 # Logs
 *.log
+
+# PDF files - keep locally, do not upload
+AI_Resume_Analyzer.pdf
+tasks.pdf
