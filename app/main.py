@@ -10,7 +10,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
+from app.routes.career import router as career_router
 from app.config import settings
 from app.database import init_db
 from app.routes import auth, career, jobs, recommendations, resumes
@@ -47,7 +47,7 @@ app.include_router(resumes.router)
 app.include_router(jobs.router)
 app.include_router(recommendations.router)
 app.include_router(career.router)
-
+app.include_router(career_router)
 
 # ---------------------------------------------------------------------------
 # Global error handlers — every error response has a consistent
