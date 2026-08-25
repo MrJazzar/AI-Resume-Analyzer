@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Career Advisor — AI Resume Analyzer</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<div class="sidebar-backdrop"></div>
+<div class="app-shell">
+
+  <div class="mobile-topbar">
+    <div class="brand-name">AI Resume Analyzer</div>
+    <button data-nav-toggle aria-label="Open menu">☰</button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-name">AI Resume<br />Analyzer</div>
+    </div>
+    <nav>
+      <a href="dashboard.html" data-page="dashboard.html"><span class="icon">⌂</span> Dashboard</a>
+      <a href="resume.html" data-page="resume.html"><span class="icon">▤</span> Resume</a>
+      <a href="jobs.html" data-page="jobs.html"><span class="icon">◫</span> Jobs</a>
+      <a href="recommendations.html" data-page="recommendations.html"><span class="icon">✦</span> Recommendations</a>
+      <a href="career.html" data-page="career.html"><span class="icon">↗</span> Career Advisor</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" data-user-initials>—</div>
+        <div class="who">
+          <div class="name" data-user-name>Loading…</div>
+          <div class="email" data-user-email></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-on-dark btn-block btn-sm" data-logout>Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div class="lede">
+        <span class="eyebrow">Career Advisor</span>
+        <h1>Plan the path forward</h1>
+        <p>Grounded in the knowledge base — compares your resume against a target career.</p>
+      </div>
+    </div>
+
+    <div id="career-empty" class="state-block" style="display:none;">
+      <div class="state-title">No resume yet</div>
+      <div class="state-sub">Upload and analyze a resume first so the advisor has skills to work with.</div>
+      <a href="resume.html" class="btn btn-primary btn-sm" style="margin-top:14px;">Upload resume</a>
+    </div>
+
+    <div id="career-body">
+      <div class="card career-target-form">
+        <div class="field">
+          <label for="resume-select">Resume</label>
+          <select id="resume-select"></select>
+        </div>
+        <div class="field">
+          <label for="target-career">Target career</label>
+          <input type="text" id="target-career" placeholder="e.g. AI Engineer" />
+        </div>
+      </div>
+
+      <div id="career-state"></div>
+
+      <div class="career-tabs">
+        <button class="career-tab active" data-tab="missing-skills">Missing skills</button>
+        <button class="career-tab" data-tab="roadmap">Roadmap</button>
+        <button class="career-tab" data-tab="advice">Advice</button>
+        <button class="career-tab" data-tab="ask">Ask advisor</button>
+      </div>
+
+      <div class="tab-panel card" id="panel-missing-skills">
+        <div class="flex-between" style="margin-bottom:6px;">
+          <h3 class="mb-0">Missing skills</h3>
+          <button class="btn btn-ghost btn-sm" data-run-tab="missing-skills">Refresh</button>
+        </div>
+        <div id="tab-output-missing-skills"><div class="text-muted">Set a target career above to get started.</div></div>
+      </div>
+
+      <div class="tab-panel card" id="panel-roadmap" style="display:none;">
+        <div class="flex-between" style="margin-bottom:6px;">
+          <h3 class="mb-0">Learning roadmap</h3>
+          <button class="btn btn-ghost btn-sm" data-run-tab="roadmap">Refresh</button>
+        </div>
+        <div id="tab-output-roadmap"><div class="text-muted">Set a target career above to get started.</div></div>
+      </div>
+
+      <div class="tab-panel card" id="panel-advice" style="display:none;">
+        <div class="flex-between" style="margin-bottom:6px;">
+          <h3 class="mb-0">Career advice</h3>
+          <button class="btn btn-ghost btn-sm" data-run-tab="advice">Refresh</button>
+        </div>
+        <div id="tab-output-advice"><div class="text-muted">Set a target career above to get started.</div></div>
+      </div>
+
+      <div class="tab-panel card" id="panel-ask" style="display:none;">
+        <h3>Ask the advisor</h3>
+        <p class="text-muted" style="margin-bottom:14px;">Ask anything — answers are grounded in the knowledge base and your selected resume.</p>
+        <div id="ask-thread" class="ask-thread"></div>
+        <form id="ask-form" class="ask-input-row">
+          <input type="text" id="ask-input" placeholder="What should I learn to become an AI Engineer?" autocomplete="off" />
+          <button type="submit" class="btn btn-primary">Ask</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/career.js"></script>
+</body>
+</html>

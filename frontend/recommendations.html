@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recommendations — AI Resume Analyzer</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<div class="sidebar-backdrop"></div>
+<div class="app-shell">
+
+  <div class="mobile-topbar">
+    <div class="brand-name">AI Resume Analyzer</div>
+    <button data-nav-toggle aria-label="Open menu">☰</button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-name">AI Resume<br />Analyzer</div>
+    </div>
+    <nav>
+      <a href="dashboard.html" data-page="dashboard.html"><span class="icon">⌂</span> Dashboard</a>
+      <a href="resume.html" data-page="resume.html"><span class="icon">▤</span> Resume</a>
+      <a href="jobs.html" data-page="jobs.html"><span class="icon">◫</span> Jobs</a>
+      <a href="recommendations.html" data-page="recommendations.html"><span class="icon">✦</span> Recommendations</a>
+      <a href="career.html" data-page="career.html"><span class="icon">↗</span> Career Advisor</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" data-user-initials>—</div>
+        <div class="who">
+          <div class="name" data-user-name>Loading…</div>
+          <div class="email" data-user-email></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-on-dark btn-block btn-sm" data-logout>Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div class="lede">
+        <span class="eyebrow">Recommendations</span>
+        <h1>Ranked job matches</h1>
+        <p>Match scores compare your resume's skills against each job's requirements.</p>
+      </div>
+    </div>
+
+    <div id="rec-controls" class="card" style="margin-bottom:22px;">
+      <div class="field mb-0">
+        <label for="resume-select">Resume</label>
+        <select id="resume-select"></select>
+      </div>
+    </div>
+
+    <div id="rec-state"></div>
+    <div id="rec-list" class="stack"></div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/recommendations.js"></script>
+</body>
+</html>

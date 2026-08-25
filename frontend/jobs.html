@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jobs — AI Resume Analyzer</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<div class="sidebar-backdrop"></div>
+<div class="app-shell">
+
+  <div class="mobile-topbar">
+    <div class="brand-name">AI Resume Analyzer</div>
+    <button data-nav-toggle aria-label="Open menu">☰</button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-name">AI Resume<br />Analyzer</div>
+    </div>
+    <nav>
+      <a href="dashboard.html" data-page="dashboard.html"><span class="icon">⌂</span> Dashboard</a>
+      <a href="resume.html" data-page="resume.html"><span class="icon">▤</span> Resume</a>
+      <a href="jobs.html" data-page="jobs.html"><span class="icon">◫</span> Jobs</a>
+      <a href="recommendations.html" data-page="recommendations.html"><span class="icon">✦</span> Recommendations</a>
+      <a href="career.html" data-page="career.html"><span class="icon">↗</span> Career Advisor</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" data-user-initials>—</div>
+        <div class="who">
+          <div class="name" data-user-name>Loading…</div>
+          <div class="email" data-user-email></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-on-dark btn-block btn-sm" data-logout>Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div class="lede">
+        <span class="eyebrow">Jobs</span>
+        <h1>Open positions</h1>
+        <p>Browse postings, search by skill, title, or location.</p>
+      </div>
+      <button id="toggle-create" class="btn btn-primary">+ Post a job</button>
+    </div>
+
+    <form id="create-job-form" class="card" style="display:none; margin-bottom:22px;">
+      <h3>New job posting</h3>
+      <div class="analysis-grid" style="margin-top:14px;">
+        <div class="field"><label for="j-title">Title *</label><input type="text" id="j-title" name="title" required placeholder="AI Engineer" /></div>
+        <div class="field"><label for="j-company">Company</label><input type="text" id="j-company" name="company" placeholder="ABC" /></div>
+        <div class="field"><label for="j-location">Location</label><input type="text" id="j-location" name="location" placeholder="Cairo" /></div>
+        <div class="field"><label for="j-experience">Experience</label><input type="text" id="j-experience" name="experience" placeholder="1-3 years" /></div>
+      </div>
+      <div class="field">
+        <label for="j-skills">Required skills</label>
+        <input type="text" id="j-skills" name="skills" placeholder="Python, FastAPI, Machine Learning" />
+        <div class="hint">Comma-separated.</div>
+      </div>
+      <div class="field">
+        <label for="j-description">Description</label>
+        <textarea id="j-description" name="description" placeholder="Build AI applications..."></textarea>
+      </div>
+      <div id="create-error"></div>
+      <div class="flex-gap">
+        <button type="submit" class="btn btn-primary">Post job</button>
+        <button type="button" id="cancel-create" class="btn btn-ghost">Cancel</button>
+      </div>
+    </form>
+
+    <div class="search-bar">
+      <input type="search" id="job-search" placeholder="Search by title, skill, company, or location…" />
+    </div>
+
+    <div id="job-state"></div>
+    <div id="job-empty" class="state-block" style="display:none;">
+      <div class="state-title">No jobs match</div>
+      <div class="state-sub">Try a different search, or post a new job.</div>
+    </div>
+    <div id="job-grid" class="job-grid"></div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/jobs.js"></script>
+</body>
+</html>
