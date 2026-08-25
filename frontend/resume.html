@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Resume — AI Resume Analyzer</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+<div class="sidebar-backdrop"></div>
+<div class="app-shell">
+
+  <div class="mobile-topbar">
+    <div class="brand-name">AI Resume Analyzer</div>
+    <button data-nav-toggle aria-label="Open menu">☰</button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-name">AI Resume<br />Analyzer</div>
+    </div>
+    <nav>
+      <a href="dashboard.html" data-page="dashboard.html"><span class="icon">⌂</span> Dashboard</a>
+      <a href="resume.html" data-page="resume.html"><span class="icon">▤</span> Resume</a>
+      <a href="jobs.html" data-page="jobs.html"><span class="icon">◫</span> Jobs</a>
+      <a href="recommendations.html" data-page="recommendations.html"><span class="icon">✦</span> Recommendations</a>
+      <a href="career.html" data-page="career.html"><span class="icon">↗</span> Career Advisor</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" data-user-initials>—</div>
+        <div class="who">
+          <div class="name" data-user-name>Loading…</div>
+          <div class="email" data-user-email></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-on-dark btn-block btn-sm" data-logout>Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div class="lede">
+        <span class="eyebrow">Resume</span>
+        <h1>Upload &amp; analyze</h1>
+        <p>Add a PDF or DOCX resume — we'll extract the text and run it through the analyzer agent.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+      <h3>Upload a new resume</h3>
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Upload resume file">
+        <div class="icon">⇧</div>
+        <div class="title">Drop a file here or click to browse</div>
+        <div class="text-muted">PDF or DOCX, up to 10 MB</div>
+        <input type="file" id="file-input" accept=".pdf,.docx" />
+      </div>
+      <div id="file-picked" class="file-picked" style="display:none;">
+        <div><strong class="fp-name"></strong> <span class="text-muted fp-size"></span></div>
+        <button id="upload-btn" class="btn btn-primary btn-sm" disabled>Upload &amp; extract</button>
+      </div>
+      <div id="upload-error" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="dash-grid">
+      <div>
+        <div class="card" id="detail-card" style="display:none; margin-bottom:24px;">
+          <div class="flex-between" style="margin-bottom:6px;">
+            <div>
+              <h3 id="detail-filename" style="margin-bottom:2px;">—</h3>
+              <div class="text-muted" id="detail-date"></div>
+            </div>
+            <button id="analyze-btn" class="btn btn-accent btn-sm">Analyze resume</button>
+          </div>
+          <div id="detail-state" style="margin-top:10px;"></div>
+
+          <div id="analysis-box" style="display:none;"></div>
+          <div id="no-analysis-box" style="display:none;">
+            <hr class="rule" />
+            <div class="state-block" style="padding:20px 8px;">
+              <div class="state-title">Not analyzed yet</div>
+              <div class="state-sub">Run the analyzer agent to extract skills, education, experience, and projects.</div>
+            </div>
+          </div>
+
+          <hr class="rule" />
+          <details>
+            <summary style="cursor:pointer; font-weight:600; font-size:13.5px; color:var(--ink-soft);">View extracted raw text</summary>
+            <pre id="raw-text-box" style="white-space:pre-wrap; font-size:12.5px; color:var(--ink-soft); background:var(--surface-sunken); padding:14px; border-radius:8px; margin-top:10px; max-height:280px; overflow:auto;"></pre>
+          </details>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Your resumes</h3>
+        <div id="resume-list"><div class="loading-inline"><span class="spinner"></span> Loading…</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/resume.js"></script>
+</body>
+</html>

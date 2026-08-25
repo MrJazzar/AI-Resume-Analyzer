@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create account — AI Resume Analyzer</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-visual">
+    <svg class="contour-lines" viewBox="0 0 500 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path d="M-20 620 C 120 560, 180 700, 320 640 S 560 560, 700 620" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2"/>
+      <path d="M-20 680 C 120 620, 180 760, 320 700 S 560 620, 700 680" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <path d="M-20 560 C 120 500, 180 640, 320 580 S 560 500, 700 560" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+      <path d="M-20 100 C 140 40, 200 160, 360 90 S 600 30, 720 90" fill="none" stroke="rgba(217,140,43,0.35)" stroke-width="2"/>
+    </svg>
+
+    <div class="brand">
+      <div class="brand-mark">R</div>
+      <div class="brand-name">AI Resume Analyzer</div>
+    </div>
+
+    <div class="auth-pitch">
+      <span class="eyebrow">Get started</span>
+      <h1>Turn your resume into a career plan.</h1>
+      <p>Upload your CV once and get an AI breakdown of your skills, ranked job matches, and a personalized roadmap to close the gaps.</p>
+
+      <div class="auth-steps">
+        <div class="auth-step"><span class="dot">1</span> Create your free account</div>
+        <div class="auth-step"><span class="dot">2</span> Upload a PDF or DOCX resume</div>
+        <div class="auth-step"><span class="dot">3</span> See where you stand — and what's next</div>
+      </div>
+    </div>
+
+    <div></div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-box">
+      <div class="kicker">Create account</div>
+      <h2>Let's get started</h2>
+      <p class="sub">It takes less than a minute.</p>
+
+      <div id="form-error"></div>
+
+      <form id="register-form" novalidate>
+        <div class="field">
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" placeholder="Mo Hassan" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password" minlength="8" />
+          <ul class="password-hint-list"><li>At least 8 characters</li></ul>
+        </div>
+        <div class="field">
+          <label for="confirm">Confirm password</label>
+          <input type="password" id="confirm" name="confirm" placeholder="••••••••" required autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+      </form>
+
+      <div class="auth-switch">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
