@@ -1,41 +1,51 @@
 # AI Resume Analyzer
 
-Backend foundation for the AI Resume Analyzer team project — FastAPI + SQLite,
-with database models, cookie-based session authentication, and a basic API
-structure ready for the rest of the team to build on.
+AI Resume Analyzer is a FastAPI application that lets users upload resumes,
+extract their text, analyze them with Gemini, compare them with job postings,
+and get RAG-based career advice from a local knowledge base. It includes a
+static HTML/CSS/JavaScript frontend and a SQLite database for local development.
+
+## Features
+
+- Cookie-based session authentication (no JWT)
+- PDF and DOCX resume upload and text extraction
+- Structured resume analysis using the Gemini API
+- Job posting CRUD operations and skill search
+- Resume-to-job matching with deterministic scores and optional Gemini explanations
+- Career advice, missing-skill analysis, and learning roadmaps using RAG
+- FastAPI Swagger UI and a pytest test suite
 
 ## Stack
 
 - **FastAPI** — web framework
 - **SQLAlchemy** — ORM
 - **SQLite** — database
-- **Passlib (bcrypt)** — password hashing
-- **Cookie-based sessions** — server-side sessions stored in the DB, sent to
-  the client as an `HttpOnly` cookie (not JWT)
+- **ChromaDB and sentence-transformers** — semantic search for RAG
+- **Gemini REST API** — resume analysis and generated career advice
+- **Cookie-based sessions** — server-side sessions stored in the database
 
 ## Project structure
 
-This repository contains the Member 1 foundation and the Member 2 resume
-upload, extraction, and AI analysis implementation. Remaining folders are
-scaffolds for later team members.
+The backend, RAG pipeline, job matching, career endpoints, and static frontend
+are included in this repository.
 
 ```
 AI-Resume-Analyzer/
 ├── app/
-│   ├── main.py            # FastAPI app, CORS, routers, error handlers
-│   ├── database.py        # SQLAlchemy engine/session/Base
-│   ├── config.py          # Settings loaded from .env
-│   ├── models/            # SQLAlchemy models (user, resume, job, resume_analysis, session)
-│   ├── schemas/           # Pydantic request/response schemas
-│   ├── routes/            # auth, resumes, jobs, recommendations, career
-│   ├── services/          # authentication, extraction, and analysis services
-│   ├── agents/            # resume_analyzer.py; later job/career agents
-│   ├── rag/               # (empty scaffold) → Member 4: loader.py, retriever.py, pipeline.py
-│   └── utils/             # security.py, exceptions.py, deps.py, validators.py
-├── knowledge_base/        # (empty scaffold) → Member 4: skills/, roadmaps/, jobs/, learning_resources/, resume_guidelines/
-├── frontend/               # placeholder for frontend app → Member 5
-├── data/                   # SQLite DB file lives here
-├── uploads/                 # uploaded resume files
+│   ├── main.py             # FastAPI app, CORS, routers, and error handlers
+│   ├── database.py         # SQLAlchemy engine, sessions, and initialization
+│   ├── config.py           # Environment-backed settings
+│   ├── models/             # Database models
+│   ├── schemas/            # Pydantic request and response schemas
+│   ├── routes/             # Auth, resumes, jobs, recommendations, career
+│   ├── services/           # Extraction, analysis, matching, and career logic
+│   ├── agents/             # Resume analysis agent entry point
+│   ├── rag/                # Loader, chunker, embeddings, vector store, generator
+│   └── utils/              # Dependencies, security, validators, and exceptions
+├── knowledge_base/         # Documents used by the RAG pipeline
+├── frontend/               # Static frontend pages, styles, and scripts
+├── data/                   # SQLite database, created at runtime
+├── uploads/                # Uploaded resume files, ignored by Git
 ├── tests/                  # pytest suite
 ├── requirements.txt
 ├── .env.example
@@ -43,28 +53,77 @@ AI-Resume-Analyzer/
 └── README.md
 ```
 
-## Setup
+## Requirements
 
-```bash
-git clone <REPOSITORY_URL>
-cd AI-Resume-Analyzer
+- Python 3.10 or newer
+- Internet access on the first RAG run to download the embedding model
+- A Gemini API key for resume analysis and generated career advice
 
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+## Setup on Windows
 
-pip install -r requirements.txt
-
-cp .env.example .env            # then edit SECRET_KEY etc.
-# Set AI_API_KEY in .env to enable AI resume analysis (default: gemini-3.6-flash).
-
-uvicorn app.main:app --reload
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
 
-The API is now running at `http://127.0.0.1:8000`. Interactive docs at
-`http://127.0.0.1:8000/docs`.
+Edit `.env` and set at least a long `SECRET_KEY`. `AI_API_KEY` is required for
+Gemini-backed resume analysis and RAG generation. Deterministic job matching
+still works without it.
 
-Tables are created automatically on startup (`init_db()` in `database.py`) —
-no manual migration step is needed for this phase of the project.
+Always use `python -m pip` and `python -m pytest` after activation so commands
+use the project environment rather than the system Python installation.
+
+If PowerShell blocks activation, run this for the current window:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+## Run the backend
+
+```powershell
+python -m uvicorn app.main:app --reload
+```
+
+The API runs at `http://127.0.0.1:8000`. Interactive docs are available at
+`http://127.0.0.1:8000/docs`, and the health check is at `/health`.
+
+Database tables are created automatically at startup. The default database is
+`data/app.db`, and uploaded files are stored in `uploads/`.
+
+## Run the frontend
+
+Keep the backend running, open a second PowerShell window, and serve the static
+frontend:
+
+```powershell
+cd frontend
+python -m http.server 5500
+```
+
+Open `http://127.0.0.1:5500/index.html`. The frontend sends requests to
+`http://127.0.0.1:8000` and includes the session cookie automatically. If you
+use another frontend port, add its exact origin to `ALLOWED_ORIGINS` in `.env`.
+
+## Configuration
+
+`.env.example` contains the supported settings. For local HTTP development,
+keep `SESSION_COOKIE_SECURE=false`; set it to `true` only with HTTPS.
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `SECRET_KEY` | Session security key | required outside tests |
+| `DATABASE_URL` | SQLAlchemy database URL | SQLite at `data/app.db` |
+| `AI_API_KEY` | Gemini API key | empty |
+| `AI_MODEL` | Gemini model name | `gemini-3.6-flash` |
+| `ALLOWED_ORIGINS` | Comma-separated frontend origins | ports 3000 and 5173 |
+| `SESSION_EXPIRE_MINUTES` | Session lifetime | `1440` |
+| `SESSION_COOKIE_SECURE` | HTTPS-only cookie flag | `false` |
+| `UPLOAD_DIR` | Resume upload directory | `uploads/` |
 
 ## API overview
 
@@ -87,13 +146,15 @@ no manual migration step is needed for this phase of the project.
 | GET    | `/api/jobs/search`    | No  | Search jobs by skill query parameter |
 | GET    | `/api/recommendations/{resume_id}` | Yes | List job recommendations ranked by score |
 | GET    | `/api/recommendations/{resume_id}/{job_id}` | Yes | Get detailed recommendation match with LLM explanation |
-| GET    | `/api/career/`        | Yes | Stub — Member 4 |
+| GET    | `/api/career/`        | Yes | Check career advisor availability |
+| GET    | `/api/career/missing-skills/{resume_id}` | Yes | Find missing skills for a target career |
+| GET    | `/api/career/roadmap/{resume_id}` | Yes | Generate a learning roadmap |
+| GET    | `/api/career/advice/{resume_id}` | Yes | Generate personalized career advice |
+| POST   | `/api/career/ask` | Yes | Ask a RAG career question |
 
-Auth uses an `HttpOnly` session cookie (`session_id` by default), not a
-bearer token — the browser sends it automatically on each request. When
-calling the API from a frontend dev server, requests must be made with
-credentials included (e.g. `fetch(url, { credentials: "include" })`) and the
-frontend origin must be listed in `ALLOWED_ORIGINS`.
+Auth uses an `HttpOnly` session cookie (`session_id` by default), not a bearer
+token. Browser requests must include credentials, which the included frontend
+already does.
 
 ### Example: register
 
@@ -131,26 +192,20 @@ and the global handlers in `app/main.py`).
 
 ## Running tests
 
-```bash
-pytest tests/ -v
+```powershell
+python -m pytest tests/ -v
 ```
 
-The test suite covers authentication plus resume validation, DOCX upload,
-text extraction, analysis, and analysis retrieval. Resume analysis calls the
-configured Gemini model and returns structured JSON; without `AI_API_KEY`, the
-analysis endpoint returns `503` rather than producing a local fallback result.
+Tests use an in-memory SQLite database. Most AI paths are mocked, so a real
+`AI_API_KEY` is not required to run the suite.
 
-## For the next team member
+## Common issues
 
-- Use `Depends(get_current_user)` from `app.utils.deps` to protect any new
-  endpoint — see `app/routes/auth.py::me` for an example.
-- Use `Depends(get_db)` from `app.database` to get a DB session.
-- Resume files are stored under `uploads/` with generated names; user files
-  are ignored by Git. PDF and DOCX uploads are limited to 10 MB.
-- Raise `BadRequestError` / `NotFoundError` / etc. from `app.utils.exceptions`
-  for consistent `{"detail": "..."}` error responses.
-- `app/rag/` and `knowledge_base/` remain scaffolds for Member 4; Member 3
-  can add job matching without changing the resume API prefixes.
+- **`SECRET_KEY is not set`:** copy `.env.example` to `.env` and set `SECRET_KEY`.
+- **`No module named sentence_transformers`:** activate `.venv`, then reinstall the requirements.
+- **CORS errors:** add the exact frontend origin, such as `http://127.0.0.1:5500`, to `ALLOWED_ORIGINS`.
+- **AI analysis returns `503`:** set `AI_API_KEY`; Gemini features need it.
+- **Upload errors:** only PDF and DOCX files up to 10 MB are accepted.
 
 ## Git workflow
 
@@ -161,12 +216,11 @@ git commit -m "Implement backend foundation, database, and authentication"
 git push origin feature/backend-foundation
 ```
 
-Then open a Pull Request into `main`. After merge, the next team member
-starts from the latest `main`:
+To clone the repository and start from the latest `main`:
 
-```bash
-git clone <REPOSITORY_URL>
+```powershell
+git clone https://github.com/MrJazzar/AI-Resume-Analyzer.git
 cd AI-Resume-Analyzer
 git checkout main
-git pull origin main
+git pull --ff-only origin main
 ```

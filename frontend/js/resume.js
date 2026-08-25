@@ -232,7 +232,9 @@ async function loadResumeDetail(id) {
       await tryLoadAnalysis();
     } catch (err) {
       const msg =
-        err.status === 503
+        err.status === 503 && err.message.includes("quota")
+          ? err.message
+          : err.status === 503
           ? "AI analysis isn't configured on the server yet (missing AI_API_KEY)."
           : err.message;
       detailState.innerHTML = `<div class="alert alert-error"><span class="alert-icon">⚠</span><span>${msg}</span></div>`;

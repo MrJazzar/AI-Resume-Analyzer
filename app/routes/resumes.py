@@ -4,6 +4,7 @@ import json
 import uuid
 from pathlib import Path
 
+import httpx
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
@@ -94,6 +95,13 @@ def analyze_resume_endpoint(resume_id: int, db: Session = Depends(get_db), curre
         result = analyze_resume(resume.raw_text)
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code == 429:
+            raise HTTPException(
+                status_code=503,
+                detail="AI service quota exceeded. Wait and retry, or configure a different API key/model.",
+            ) from exc
+        raise HTTPException(status_code=502, detail="AI analysis service returned an error") from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail="AI analysis service is unavailable") from exc
     analysis = ResumeAnalysis(resume_id=resume.id, summary=result["summary"], **{

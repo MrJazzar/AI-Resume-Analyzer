@@ -47,6 +47,8 @@ class RAGPipeline:
         )
 
     def ask(self, question: str, top_k: int = 5):
+        if self.vector_store.count() == 0:
+            self.index_knowledge_base()
 
         results = self.retrieve(
             query=question,

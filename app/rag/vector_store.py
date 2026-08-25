@@ -54,3 +54,6 @@ class VectorStore:
             query_embeddings=[query_embedding],
             n_results=top_k,
         )
+
+    def count(self) -> int:
+        return self.collection.count()

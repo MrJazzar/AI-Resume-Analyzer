@@ -37,7 +37,10 @@ User Question:
 Retrieved Context:
 {context}
 
-Return valid JSON with this structure:
+Return valid JSON. Always include "answer" and "sources". If the user
+question requests additional structured fields, include those fields in the
+same JSON response and fill them using the provided context. Use this base
+structure:
 {{
     "answer": "your answer",
     "sources": ["source1", "source2"]
